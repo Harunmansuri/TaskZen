@@ -25,11 +25,8 @@ const Login = () => {
           withCredentials: true,
         }
       );
-
-      if (response.status === 200) {
-        alert("Login Successful 🎉");
-      }
-      navigate("/tasks");
+           localStorage.setItem("userLoggedIn", "yes");
+           navigate("/dashboard");
     } catch (error) {
       alert(error.response.message || "Login Failed ❌");
     }

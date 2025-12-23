@@ -1,17 +1,18 @@
 import express from "express";
 import auth from "../middleware/auth.middleware.js";
 import {
-  addtask,
-  deletetask,
-  edittask,
-  gettask,
-} from "../controllers/task.controller";
+  addTask,
+  getTask,
+  editTask,
+  deleteTask,
+} from "../controllers/task.controller.js";
 
 const router = express.Router();
-router.post("/addTask", auth, addtask);
-router.get("/getTask/:id", auth, gettask);
-router.put("/editTask/:id", auth, edittask);
-router.delete("/deleteTask/:id", auth, deletetask);
 
+// Protected Task Routes
+router.post("/add-task", auth, addTask);
+router.get("/get-task/:id", auth, getTask);
+router.put("/edit-task/:id", auth, editTask);
+router.delete("/delete-task/:id", auth, deleteTask);
 
 export default router;

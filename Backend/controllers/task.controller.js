@@ -1,6 +1,7 @@
 import task from "../models/task.model.js";
 
-export const addtask = async (req, res) => {
+
+export const addTask = async (req, res) => {
   try {
     const { title, description, priority, status } = req.body;
     const user = req.user;
@@ -42,7 +43,7 @@ export const addtask = async (req, res) => {
   }
 };
 
-export const edittask = async (req, res) => {
+export const editTask = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, priority, status } = req.body;
@@ -79,7 +80,7 @@ export const edittask = async (req, res) => {
   }
 };
 
-export const gettask = async (req, res) => {
+export const getTask = async (req, res) => {
   try {
     const { id } = req.params;
     const taskDeatils = await task.find({ id: id });
@@ -94,7 +95,7 @@ export const gettask = async (req, res) => {
   }
 };
 
-export const deletetask = async (req, res) => {
+export const deleteTask = async (req, res) => {
   try {
     const { id } = req.params;
     await task.findByIdAndDelete(id);

@@ -1,27 +1,30 @@
-import { Mongoose } from "mongoose";
+import mongoose from "mongoose";
 
-const taskSchema = new Mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
+const taskSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    priority: {
+      type: String,
+      enum: ["Low", "Medium", "High"],
+      default: "Low",
+    },
+    status: {
+      type: String,
+      enum: ["Start", "In Progress", "Completed"],
+      default: "Start",
+    },
   },
-  description: {
-    type: String,
-    required: true,
-  },
-  priority: {
-    type: String,
-    required: true,
-    enum: ["Low", "Medium", "High"],
-    default: "Low",
-  },
-  status: {
-    type: String,
-    required: true,
-    enum: ["Start", "In Progress", "Completed"],
-    default: "Start",
-  },
-});
+  { timestamps: true }
+);
 
 const Task = mongoose.model("Task", taskSchema);
 
