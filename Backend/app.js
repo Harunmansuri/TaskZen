@@ -1,19 +1,66 @@
-import express, { urlencoded } from "express";
-const app = express();
+import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
+import morgan from "morgan";
 import connectDB from "./config/db.js";
+import userRoutes from "./routes/user.route.js";
 
+// Load env variables
 dotenv.config();
-const PORT = process.env.PORT || 4002;
 
-app.use(express.json());
-app.use(urlencoded({ extended: true }));
+// Init app
+const app = express();
+const PORT = process.env.PORT || 4002;
+// ✅ Built-in Express body parsers
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: true }));
+
+// -------------------- Middleware --------------------
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
+
+// ✅ Built-in Express body parsers
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: true }));
+
+// Logger (development only)
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
+
+// -------------------- Database --------------------
 connectDB();
 
+// -------------------- Routes --------------------
+app.use("/api/v1/users", userRoutes);
+
+// Health Check
 app.get("/", (req, res) => {
-  res.send("Hello from the backend server!");
+  res.status(200).json({ success: true, message: "API is running 🚀" });
 });
 
+// -------------------- 404 Handler --------------------
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
+
+// -------------------- Global Error Handler --------------------
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.statusCode || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
+
+// -------------------- Server --------------------
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
