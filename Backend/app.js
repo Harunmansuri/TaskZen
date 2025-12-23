@@ -4,6 +4,8 @@ import cors from "cors";
 import morgan from "morgan";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/user.route.js";
+import cookieParser from "cookie-parser";
+import taskRoutes from "./routes/task.route.js";
 
 // Load env variables
 dotenv.config();
@@ -18,7 +20,8 @@ app.use(express.urlencoded({ extended: true }));
 // -------------------- Middleware --------------------
 app.use(
   cors({
-    origin: "*",
+    origin: ["http://localhost:5173"],
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
@@ -26,6 +29,7 @@ app.use(
 // ✅ Built-in Express body parsers
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Logger (development only)
 if (process.env.NODE_ENV === "development") {
@@ -37,6 +41,8 @@ connectDB();
 
 // -------------------- Routes --------------------
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/auth", userRoutes);
+app.use("/api/v1", taskRoutes);
 
 // Health Check
 app.get("/", (req, res) => {
