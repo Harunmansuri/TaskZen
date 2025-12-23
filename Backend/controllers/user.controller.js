@@ -19,7 +19,16 @@ export const registerUser = async (req, res) => {
         message: "Username, email and password cannot be empty",
       });
     }
+
+    if(username.length < 5 || username.length > 30){
+      return res.status(400).json({
+        success: false,
+        message: "Username must be between 5 and 30 characters long",
+      });
+    }
+
     // 2️⃣ Email format validation
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({
