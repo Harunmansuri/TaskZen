@@ -1,5 +1,5 @@
 import React from "react";
-import { Link , useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 
@@ -25,10 +25,10 @@ const Login = () => {
           withCredentials: true,
         }
       );
-           localStorage.setItem("userLoggedIn", "yes");
-           navigate("/dashboard");
+      localStorage.setItem("userLoggedIn", "yes");
+      window.location.href = "/dashboard"; // 🔥 important
     } catch (error) {
-      alert(error.response.message || "Login Failed ❌");
+      alert(error.response.data.message);
     }
   };
   return (
@@ -62,8 +62,10 @@ const Login = () => {
             value={values.password}
             onChange={change}
           />
-          <button className="bg-blue-800 text-white py-2 font-semibold rounded hover:bg-blue-700 transition duration-300"
-          onClick={login}>
+          <button
+            className="bg-blue-800 text-white py-2 font-semibold rounded hover:bg-blue-700 transition duration-300"
+            onClick={login}
+          >
             Login
           </button>
           <p className="text-center font-semibold text-gray-900">

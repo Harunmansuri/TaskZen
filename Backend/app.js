@@ -18,6 +18,8 @@ app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // -------------------- Middleware --------------------
+app.use(cookieParser());
+
 app.use(
   cors({
     origin: ["http://localhost:5173"],
@@ -29,7 +31,7 @@ app.use(
 // ✅ Built-in Express body parsers
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+
 
 // Logger (development only)
 if (process.env.NODE_ENV === "development") {
@@ -42,7 +44,7 @@ connectDB();
 // -------------------- Routes --------------------
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/auth", userRoutes);
-app.use("/api/v1", taskRoutes);
+app.use("/api/v1/", taskRoutes);
 
 // Health Check
 app.get("/", (req, res) => {

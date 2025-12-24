@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 
@@ -88,20 +89,25 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
+
     if (!email || !password) {
       return res.status(400).json({
         success: false,
         message: "Email and password are required",
       });
     }
+
+    email = email.trim().toLowerCase();
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "User not found Please register first",
       });
     }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -109,36 +115,38 @@ export const loginUser = async (req, res) => {
         message: "Invalid credentials",
       });
     }
-    res.status(200).json({
+
+    // ✅ Create JWT token
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "30d" }
+    );
+
+    // ✅ Set cookie FIRST
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None", // frontend-backend different domain ho to
+      path: "/",      // 🔴
+    });
+
+    // ✅ Send response ONCE
+    return res.status(200).json({
       success: true,
       message: "Login successful",
+      token, // optional (Postman testing ke liye)
       user: {
         id: user._id,
         username: user.username,
         email: user.email,
       },
     });
-    if (user) {
-      const token = jwt.sign(
-        { id: user._id, email: user.email },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "30d",
-        }
-      );
-      res.cookie("token", token, {
-        httpOnly: true,
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-        secure: process.env.NODE_ENV === "production", // Set secure flag in production
-        sameSite: "None",
-      });
-      res.status(200).json({ message: "Login successful" });
-    } else {
-      res.status(401).json({ message: "Login failed" });
-    }
+
   } catch (error) {
     console.error("Login Error:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Server error during login",
     });
@@ -146,12 +154,20 @@ export const loginUser = async (req, res) => {
 };
 
 
+
 export const logout = (req, res) => {
   try {
     res.clearCookie("token", {
-    httpOnly: true,
-  });
-  res.status(200).json({ message: "Logout successful" });
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None",
+      path: "/", // 🔥 MUST SAME
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Logout successful",
+    });
   } catch (error) {
     console.error("Logout Error:", error);
     res.status(500).json({
@@ -159,4 +175,7 @@ export const logout = (req, res) => {
       message: "Server error during logout",
     });
   }
-}
+};
+
+
+

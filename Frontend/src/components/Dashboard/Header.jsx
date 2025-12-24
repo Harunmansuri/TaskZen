@@ -6,16 +6,22 @@ import axios from "axios";
 const Header = ({ setAddTaskDiv }) => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    try {
-        axios.post("http://localhost:3000/api/v1/users/logout");
-        localStorage.removeItem("token");
-        localStorage.removeItem("userLoggedIn");
-        navigate("/login");
-    } catch (error) {
-        console.error("Logout error:", error);
-    }
-  };
+const handleLogout = async () => {
+  try {
+    await axios.post(
+      "http://localhost:3000/api/v1/users/logout",
+      {},
+      { withCredentials: true } // 🔥 MOST IMPORTANT
+    );
+
+    localStorage.removeItem("userLoggedIn");
+    alert("Logged out successfully");
+    navigate("/login");
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
+};
+
 
   return (
     <header className="flex px-12 items-center justify-between h-20 border-b border-gray-200 bg-white">

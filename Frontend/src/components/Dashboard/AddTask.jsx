@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const AddTask = ({ setAddTaskDiv }) => {
   const [task, setTask] = useState({
@@ -12,10 +13,20 @@ const AddTask = ({ setAddTaskDiv }) => {
     setTask({ ...task, [e.target.name]: e.target.value });
   };
 
-  const submitHandler = (e) => {
+  const addTask = async (e) => {
     e.preventDefault();
-    console.log(task); // API call yahan aayega
-    setAddTaskDiv(false);
+
+    try {
+      const response = await axios.post("http://localhost:3000/api/v1/add-task", task,
+        { withCredentials: true }
+
+      );
+        alert(response.data.message);
+
+      setAddTaskDiv(false);
+    } catch (error) {
+      alert(error.response.data.message);
+    }
   };
 
   return (
@@ -23,7 +34,7 @@ const AddTask = ({ setAddTaskDiv }) => {
       <h1 className="text-center font-semibold text-xl">Add Task</h1>
       <hr className="mb-4 mt-2" />
 
-      <form onSubmit={submitHandler} className="flex flex-col gap-4">
+      <form onSubmit={addTask} className="flex flex-col gap-4">
         <input
           type="text"
           placeholder="Task Title"
