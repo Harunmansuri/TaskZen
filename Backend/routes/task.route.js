@@ -1,5 +1,5 @@
 import express from "express";
-import auth from "../middleware/auth.middleware.js";
+import authMiddleware from "../middleware/auth.middleware.js";
 import {
   addTask,
   getTask,
@@ -10,9 +10,9 @@ import {
 const router = express.Router();
 
 // Protected Task Routes
-router.post("/add-task", auth, addTask);
-router.get("/get-task/:id", auth, getTask);
-router.put("/edit-task/:id", auth, editTask);
-router.delete("/delete-task/:id", auth, deleteTask);
+router.post("/add-task", authMiddleware, addTask);
+router.get("/get-task/:id", authMiddleware, getTask);
+router.put("/edit-task/:id", authMiddleware, editTask);
+router.delete("/delete-task/:id", authMiddleware, deleteTask);
 
 export default router;

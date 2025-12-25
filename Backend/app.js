@@ -46,6 +46,7 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/auth", userRoutes);
 app.use("/api/v1/", taskRoutes);
 
+
 // Health Check
 app.get("/", (req, res) => {
   res.status(200).json({ success: true, message: "API is running 🚀" });

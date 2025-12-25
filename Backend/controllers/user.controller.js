@@ -117,11 +117,9 @@ export const loginUser = async (req, res) => {
     }
 
     // ✅ Create JWT token
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "30d" }
-    );
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "30d",
+    });
 
     // ✅ Set cookie FIRST
     res.cookie("token", token, {
@@ -129,7 +127,7 @@ export const loginUser = async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       secure: process.env.NODE_ENV === "production",
       sameSite: "None", // frontend-backend different domain ho to
-      path: "/",      // 🔴
+      path: "/", // 🔴
     });
 
     // ✅ Send response ONCE
@@ -143,7 +141,6 @@ export const loginUser = async (req, res) => {
         email: user.email,
       },
     });
-
   } catch (error) {
     console.error("Login Error:", error);
     return res.status(500).json({
@@ -152,8 +149,6 @@ export const loginUser = async (req, res) => {
     });
   }
 };
-
-
 
 export const logout = (req, res) => {
   try {
@@ -177,5 +172,52 @@ export const logout = (req, res) => {
   }
 };
 
+export const getUserProfile = async (req, res) => {
+  try {
+    const { user } = req;
 
+    const getDetails = await User.findById(user.id)
+      .populate("tasks")
+      .select("-password -__v -createdAt -updatedAt");
+
+    if (!getDetails) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const allTasks = getDetails.tasks;
+
+    // ✅ Status mapping EXACTLY like Task model
+    const yetToStart = allTasks.filter(
+      task => task.status === "Start"
+    );
+
+    const inProgress = allTasks.filter(
+      task => task.status === "In Progress"
+    );
+
+    const completed = allTasks.filter(
+      task => task.status === "Completed"
+    );
+
+    return res.status(200).json({
+      success: true,
+      tasks: {
+        yetToStart,
+        inProgress,
+        completed,
+      },
+      user: getDetails,
+    });
+
+  } catch (error) {
+    console.error("Get User Profile Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
 

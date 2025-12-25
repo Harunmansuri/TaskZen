@@ -4,9 +4,9 @@ import axios from "axios";
 const AddTask = ({ setAddTaskDiv }) => {
   const [task, setTask] = useState({
     title: "",
+    description: "",
     priority: "Low",
     status: "Start",
-    description: "",
   });
 
   const changeHandler = (e) => {
@@ -17,11 +17,12 @@ const AddTask = ({ setAddTaskDiv }) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:3000/api/v1/add-task", task,
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/add-task",
+        task,
         { withCredentials: true }
-
       );
-        alert(response.data.message);
+      alert(response.data.message);
 
       setAddTaskDiv(false);
     } catch (error) {
